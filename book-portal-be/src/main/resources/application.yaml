@@ -2,11 +2,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  datasource:
-    username: uqi
-    password: Deneme123..
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://uqi123.mysql.database.azure.com:3306/book_portal?useSSL=true
+  # datasource:
+  #   username: root
+  #   password: rootpassword
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   url: jdbc:mysql://mysql_container:3306/book_portal
 #    hikari:
 #      connection-timeout: 12000
   jpa:

@@ -1,6 +1,6 @@
 services:
   book-portal-be:
-    image: ugurcanerdogan/book-portal-be:latest
+    image: zhangjungeac/book-portal-be:latest
     container_name: "book-portal-be"
     networks:
       - book-portal-network
@@ -10,7 +10,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: rootpassword
 
   book-portal-fe:
-    image: ugurcanerdogan/book-portal-fe:latest
+    image: zhangjungeac/book-portal-fe:latest
     container_name: "book-portal-fe"
     depends_on:
       - book-portal-be
@@ -18,7 +18,7 @@ services:
       - book-portal-network
 
   proxy:
-    image: ugurcanerdogan/book-portal-proxy:latest
+    image: zhangjungeac/book-portal-proxy:latest
     container_name: "book-portal-proxy"
     restart: always
     ports:

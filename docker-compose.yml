@@ -2,20 +2,12 @@ services:
   book-portal-be:
     image: zhangjungeac/book-portal-be:latest
     container_name: "book-portal-be"
-    networks:
-      - book-portal-network
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_container:3306/book_portal
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
 
   book-portal-fe:
     image: zhangjungeac/book-portal-fe:latest
     container_name: "book-portal-fe"
     depends_on:
       - book-portal-be
-    networks:
-      - book-portal-network
 
   proxy:
     image: zhangjungeac/book-portal-proxy:latest
@@ -23,9 +15,4 @@ services:
     restart: always
     ports:
       - "80:80"
-    networks:
-      - book-portal-network
 
-networks:
-  book-portal-network:
-    external: true

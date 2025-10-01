@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Node.js CI"]
     types: [completed]
-
+    
 jobs:
   on-success:
 
@@ -22,15 +22,13 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Run SSM Command
+      - name: Send SSM Command
+        id: ssm
         run: |
-          aws ssm send-command \
-            --targets "Key=instanceIds,Values=${{ secrets.AWS_INSTANCE_ID }}" \
-            --comment "docker-compose.yml file re-pulls newer versions of book-portal images and runs them on the instance." \
+          COMMAND_ID=$(aws ssm send-command \
+            --targets "Key=InstanceIds,Values=${{ secrets.AWS_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --region "${{ secrets.AWS_REGION }}" \
-            --output text \
-            --query "Command.CommandId" \
+            --comment "docker-compose.yml deploy" \
             --parameters 'commands=[
               "cd /home/ubuntu/book-portal",
               "sudo docker compose stop",
@@ -38,4 +36,27 @@ jobs:
               "sudo docker compose pull",
               "sudo docker compose up -d",
               "sudo docker image prune -af"
-            ]'
+            ]' \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "SSM Command ID: $COMMAND_ID"
+
+          # Wait for command to finish
+          STATUS="InProgress"
+          while [ "$STATUS" == "InProgress" ] || [ "$STATUS" == "Pending" ]; do
+            sleep 5
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id $COMMAND_ID \
+              --details \
+              --query "CommandInvocations[0].Status" \
+              --output text)
+            echo "Current status: $STATUS"
+          done
+
+          # Show output
+          aws ssm list-command-invocations \
+            --command-id $COMMAND_ID \
+            --details \
+            --query "CommandInvocations[0].CommandPlugins[0].Output" \
+            --output text
